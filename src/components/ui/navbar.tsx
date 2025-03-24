@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import {
   House,
@@ -5,7 +7,7 @@ import {
   User,
   ChevronDown,
   BookUser,
-  ChartBarStacked,
+  ChartBar,
   Bell,
   Shirt,
   Watch,
@@ -29,111 +31,71 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+const menuItems = [
+  { label: "Trang chủ", icon: House, href: "/" },
+  {
+    label: "Danh mục",
+    icon: ChartBar,
+    subItems: [
+      { label: "Quần áo", icon: Shirt, href: "/category/clothing" },
+      { label: "Đồng hồ", icon: Watch, href: "/category/watches" },
+      { label: "Trang sức", icon: Gem, href: "/category/jewelry" },
+      { label: "Điện thoại", icon: Smartphone, href: "/category/phones" },
+      { label: "Laptop", icon: Laptop, href: "/category/laptops" },
+      { label: "Đồ nội thất", icon: Armchair, href: "/category/furniture" },
+      { label: "Sách", icon: BookOpenText, href: "/category/books" },
+      { label: "Thiết bị gia dụng", icon: Refrigerator, href: "/category/appliances" },
+    ],
+  },
+  { label: "Liên hệ", icon: BookUser, href: "/contact" },
+  { label: "Giỏ hàng", icon: ShoppingCart, href: "/cart" },
+  { label: "Thông báo", icon: Bell, href: "/notifications" },
+  {
+    label: "Tài khoản",
+    icon: User,
+    subItems: [
+      { label: "Đơn mua", icon: ShoppingBasket, href: "/orders" },
+      { label: "Đơn bán", icon: Package, href: "/sell" },
+      { label: "Lịch sử giao dịch", icon: CreditCard, href: "/transactions" },
+      { label: "Cài đặt tài khoản", icon: Settings, href: "/profile" },
+    ],
+  },
+];
+
 function Navbar() {
   return (
     <nav className="bg-white shadow-md py-4 px-6 flex justify-center items-center">
       <div className="flex items-center gap-6">
-        <Link href="/">
-          <Button variant="ghost" className="text-gray-700 hover:text-blue-500">
-            <House className="h-6 w-6" />
-            Trang chủ
-          </Button>
-        </Link>
-
-        <DropdownMenu>
-          <DropdownMenuTrigger>
-            <Button
-              variant="ghost"
-              className="text-gray-700 hover:text-blue-500"
-            >
-              <ChartBarStacked className="h-6 w-6" />
-              Danh mục
-              <ChevronDown className="h-6 w-6" strokeWidth={3} />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuItem>
-              <Shirt />
-              Quần áo
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Watch />
-              Đồng hồ
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Gem />
-              Trang sức
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Smartphone />
-              Điện thoại
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Laptop />
-              Laptop
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Armchair />
-              Đồ nội thất
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <BookOpenText />
-              Sách
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Refrigerator />
-              Thiết bị gia dụng
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        <Button variant="ghost" className="text-gray-700 hover:text-blue-500">
-          <BookUser className="h-6 w-6" />
-          Liên hệ
-        </Button>
-
-        <Link href="/cart">
-          <Button variant="ghost" className="text-gray-700 hover:text-blue-500">
-            <ShoppingCart className="h-6 w-6" />
-            giỏ hàng
-          </Button>
-        </Link>
-
-        <Button variant="ghost" className="text-gray-700 hover:text-blue-500">
-          <Bell className="h-6 w-6" />
-          Thông báo
-        </Button>
-
-        <DropdownMenu>
-          <DropdownMenuTrigger>
-            <Button
-              variant="ghost"
-              className="text-gray-700 hover:text-blue-500"
-            >
-              <User className="h-6 w-6" />
-              Tài khoản
-              <ChevronDown className="h-6 w-6" strokeWidth={3} />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuItem>
-              <ShoppingBasket />
-              Đơn mua
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Package />
-              Đơn bán
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <CreditCard />
-              Lịch sử giao dịch
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Settings />
-              Cài đặt tài khoản
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {menuItems.map((item, index) =>
+          item.subItems ? (
+            <DropdownMenu key={index}>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="text-gray-700 hover:text-blue-500 flex items-center">
+                  <item.icon className="h-6 w-6" />
+                  {item.label}
+                  <ChevronDown className="h-5 w-5 ml-1" strokeWidth={3} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start">
+                {item.subItems.map((subItem, subIndex) => (
+                  <DropdownMenuItem key={subIndex} asChild className="focus:text-blue-500">
+                    <Link href={subItem.href} className="flex items-center gap-2">
+                      <subItem.icon className="h-5 w-5" />
+                      {subItem.label}
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Link key={index} href={item.href}>
+              <Button variant="ghost" className="text-gray-700 hover:text-blue-500 flex items-center">
+                <item.icon className="h-6 w-6" />
+                {item.label}
+              </Button>
+            </Link>
+          )
+        )}
       </div>
     </nav>
   );
