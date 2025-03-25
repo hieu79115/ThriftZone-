@@ -1,7 +1,9 @@
 import { Input } from "@/components/ui/input";
-import { Search, User } from "lucide-react";
+import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import LoginForm from "../ui/login-modal";
+import RegisterForm from "../ui/register-modal";
 
 export default function Header() {
   return (
@@ -15,21 +17,12 @@ export default function Header() {
         />
         <Search className="absolute left-3 top-2.5 h-5 w-5 text-white" />
       </div>
+
       <div className="flex items-center gap-4">
-        <Link href="/auth/login">
-          <Button variant="link" className="text-white">
-            Đăng nhập
-          </Button>
-        </Link>
-        <Link href="/auth/register">
-          <Button variant="link" className="text-white">
-            Đăng ký
-          </Button>
-        </Link>
+        <LoginForm />
+        <RegisterForm />
         <Link href="/sell">
-          <Button variant="outline">
-            Đăng bán
-          </Button>
+          <Button variant="outline">Đăng bán</Button>
         </Link>
       </div>
     </header>
