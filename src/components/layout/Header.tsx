@@ -11,10 +11,13 @@ import { useState } from "react";
 export default function Header() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
+
   return (
     <header className="flex justify-between items-center w-full py-4 px-6 bg-gray-900">
-      <div className="text-2xl font-bold text-white">ThriftZone</div>
-      <div className="relative w-1/3">
+      <div className="hidden md:flex text-2xl font-bold text-white">
+        ThriftZone
+      </div>
+      <div className="relative md:w-1/3 w-1/2 block">
         <Input
           type="text"
           placeholder="Tìm kiếm sản phẩm..."
@@ -23,7 +26,7 @@ export default function Header() {
         <Search className="absolute left-3 top-2.5 h-5 w-5 text-white" />
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="items-center flex gap-4">
         <Button
           variant="link"
           className="text-white"
@@ -33,13 +36,13 @@ export default function Header() {
         </Button>
         <Button
           variant="link"
-          className="text-white"
+          className="text-white hidden md:flex "
           onClick={() => setIsRegisterOpen(true)}
         >
           Đăng ký
         </Button>
-        <Link href="/sell">
-          <Button variant="outline" onClick={() => setIsLoginOpen(true)}  >
+        <Link href="/sell" className="hidden md:flex">
+          <Button variant="outline" onClick={() => setIsLoginOpen(true)}>
             Đăng bán
           </Button>
         </Link>
