@@ -2,9 +2,9 @@
 
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,9 +35,16 @@ const formSchema = z.object({
     .regex(/[0-9]/, { message: "Mật khẩu phải chứa ít nhất một số." }),
 });
 
-export default function LoginForm() {
+export default function LoginForm({
+  isOpen,
+  setIsOpen,
+  switchToRegister,
+}: {
+  isOpen: boolean;
+  setIsOpen: (open: boolean) => void;
+  switchToRegister: () => void;
+}) {
   const [showPassword, setShowPassword] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -51,98 +58,83 @@ export default function LoginForm() {
     console.log("Dữ liệu khi submit form: ", data);
     setIsOpen(false);
   };
-  const onError = (errors: any) => {
-    console.error("Form validation errors:", errors);
-  };
 
   return (
-    <>
-      <div className="flex space-x-4">
-        <Button
-          variant="link"
-          className="text-white"
-          onClick={() => setIsOpen(true)}
-        >
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogContent className="p-6 space-y-4 min-w-fit">
+        <DialogTitle className="text-xl font-semibold text-center">
           Đăng nhập
-        </Button>
-      </div>
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="p-6 space-y-4 min-w-fit">
-          <DialogTitle className="text-xl font-semibold text-center">
-            Đăng nhập
-          </DialogTitle>
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit, onError)}
-              className="space-y-4"
-            >
-              <FormField
-                control={form.control}
-                name="username"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Tài khoản</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="text"
-                        placeholder="Nhập tài khoản"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+        </DialogTitle>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="username"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Tài khoản</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="text"
+                      placeholder="Nhập tài khoản"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Mật khẩu</FormLabel>
+                  <FormControl>
+                    <Input
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Nhập mật khẩu"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="show"
+                onCheckedChange={() => setShowPassword(!showPassword)}
+                checked={showPassword}
               />
+              <Label htmlFor="show" className="text-sm font-light">
+                Hiển thị mật khẩu
+              </Label>
+            </div>
 
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Mật khẩu</FormLabel>
-                    <FormControl>
-                      <Input
-                        type={showPassword ? "text" : "password"}
-                        placeholder="Nhập mật khẩu"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <Button type="submit" className="w-full">
+              Đăng nhập
+            </Button>
 
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="show"
-                  onCheckedChange={() => setShowPassword(!showPassword)}
-                  checked={showPassword}
-                />
-                <Label htmlFor="show" className="text-sm font-light">
-                  Hiển thị mật khẩu
-                </Label>
-              </div>
-
-              <Button type="submit" className="w-full">
-                Đăng nhập
-              </Button>
-
-              <p className="text-center text-sm">
-                Chưa có tài khoản?{" "}
-                <span
-                  className="text-blue-500 cursor-pointer"
-                  onClick={() => {
-                    setShowPassword(false);
-                    setIsOpen(false);
-                  }}
-                >
-                  Đăng ký
-                </span>
-              </p>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
-    </>
+            <p className="text-center text-sm">
+              Chưa có tài khoản?{" "}
+              <span
+                className="text-blue-500 cursor-pointer"
+                onClick={() => {
+                  setShowPassword(false);
+                  switchToRegister();
+                  form.reset();
+                }}
+              >
+                Đăng ký
+              </span>
+            </p>
+          </form>
+        </Form>
+        <DialogDescription className="sr-only">Mô tả ẩn giúp cải thiện accessibility.</DialogDescription>
+      </DialogContent>
+    </Dialog>
   );
 }
