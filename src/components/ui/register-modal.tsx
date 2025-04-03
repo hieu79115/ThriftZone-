@@ -22,6 +22,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { register, login } from "@/api/auth";
 
 const formSchema = z
   .object({
@@ -64,7 +65,19 @@ export default function RegisterForm({
   });
 
   const onSubmit = (data: any) => {
-    console.log("Dữ liệu khi submit form: ", data);
+    register(data.username, data.password)
+      .then((response) => {
+        console.log("User registered successfully:", response);
+        return login(data.username, data.password);
+      })
+      .then((loginResponse) => {
+        console.log("User logged in successfully:", loginResponse);
+        setIsOpen(false);
+        window.location.reload();
+      })
+      .catch((error) => {
+        console.error("Registration failed:", error);
+      });
     setIsOpen(false);
   };
 
@@ -160,7 +173,9 @@ export default function RegisterForm({
             </p>
           </form>
         </Form>
-        <DialogDescription className="sr-only">Mô tả ẩn giúp cải thiện accessibility.</DialogDescription>
+        <DialogDescription className="sr-only">
+          Mô tả ẩn giúp cải thiện accessibility.
+        </DialogDescription>
       </DialogContent>
     </Dialog>
   );

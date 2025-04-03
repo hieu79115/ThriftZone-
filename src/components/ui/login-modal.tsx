@@ -22,6 +22,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { login } from "@/api/auth";
 
 const formSchema = z.object({
   username: z.string().min(5, {
@@ -55,7 +56,10 @@ export default function LoginForm({
   });
 
   const onSubmit = (data: any) => {
-    console.log("Dữ liệu khi submit form: ", data);
+    login(data.username, data.password).then((respone) => {
+      console.log("User login successfully:", respone);
+      window.location.reload();
+    });
     setIsOpen(false);
   };
 
@@ -133,7 +137,9 @@ export default function LoginForm({
             </p>
           </form>
         </Form>
-        <DialogDescription className="sr-only">Mô tả ẩn giúp cải thiện accessibility.</DialogDescription>
+        <DialogDescription className="sr-only">
+          Mô tả ẩn giúp cải thiện accessibility.
+        </DialogDescription>
       </DialogContent>
     </Dialog>
   );

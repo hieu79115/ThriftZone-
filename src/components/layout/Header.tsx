@@ -6,11 +6,37 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import LoginForm from "../ui/login-modal";
 import RegisterForm from "../ui/register-modal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getCurrentUser, logout } from "@/api/auth";
 
 export default function Header() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState<{ username: string } | null>(
+    null
+  );
+
+  useEffect(() => {
+    async function fetchCurrentUser() {
+      try {
+        const response = await getCurrentUser();
+        setCurrentUser(response);
+      } catch (error) {
+        console.error("Failed to fetch current user:", error);
+      }
+    }
+
+    fetchCurrentUser();
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      setCurrentUser(null);
+    } catch (error) {
+      console.error("Failed to logout:", error);
+    }
+  };
 
   return (
     <header className="flex justify-between items-center w-full py-4 px-6 bg-gray-900">
@@ -27,21 +53,41 @@ export default function Header() {
       </div>
 
       <div className="items-center flex gap-4">
-        <Button
-          variant="link"
-          className="text-white"
-          onClick={() => setIsLoginOpen(true)}
-        >
-          Đăng nhập
-        </Button>
-        <Button
-          variant="link"
-          className="text-white hidden md:flex "
-          onClick={() => setIsRegisterOpen(true)}
-        >
-          Đăng ký
-        </Button>
-        <Link href="/sell" className="hidden md:flex">
+        {currentUser ? (
+          <>
+            <Link href="/profile" className="hidden md:flex">
+              <Button variant="link" className="text-white">
+                {currentUser.username}
+              </Button>
+            </Link>
+            <Button
+              variant="link"
+              className="text-white"
+              onClick={handleLogout}
+            >
+              Đăng xuất
+            </Button>
+          </>
+        ) : (
+          <>
+            <Button
+              variant="link"
+              className="text-white"
+              onClick={() => setIsLoginOpen(true)}
+            >
+              Đăng nhập
+            </Button>
+            <Button
+              variant="link"
+              className="text-white hidden md:flex "
+              onClick={() => setIsRegisterOpen(true)}
+            >
+              Đăng ký
+            </Button>
+          </>
+        )}
+
+        <Link href="#" className="hidden md:flex">
           <Button variant="outline" onClick={() => setIsLoginOpen(true)}>
             Đăng bán
           </Button>
