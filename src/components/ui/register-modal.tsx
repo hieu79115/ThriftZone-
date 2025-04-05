@@ -22,6 +22,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { useAlert } from "@/context/AlertContext";
 import { register, login } from "@/api/auth";
 
 const formSchema = z
@@ -48,12 +49,15 @@ export default function RegisterForm({
   isOpen,
   setIsOpen,
   switchToLogin,
+  onRegisterSuccess,
 }: {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
   switchToLogin: () => void;
+  onRegisterSuccess: () => void;
 }) {
   const [showPassword, setShowPassword] = useState(false);
+  const { setAlert } = useAlert();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -70,15 +74,14 @@ export default function RegisterForm({
         console.log("User registered successfully:", response);
         return login(data.username, data.password);
       })
-      .then((loginResponse) => {
-        console.log("User logged in successfully:", loginResponse);
+      .then(() => {
+        setAlert("Đăng ký thành công!", "success");
         setIsOpen(false);
-        window.location.reload();
+        onRegisterSuccess();
       })
       .catch((error) => {
-        console.error("Registration failed:", error);
+        setAlert("Đăng ký thất bại! Tài khoản đã tồn tại.", "error");
       });
-    setIsOpen(false);
   };
 
   return (

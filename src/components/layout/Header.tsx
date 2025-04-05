@@ -8,6 +8,7 @@ import LoginForm from "../ui/login-modal";
 import RegisterForm from "../ui/register-modal";
 import { useEffect, useState } from "react";
 import { getCurrentUser, logout } from "@/api/auth";
+import { useAlert } from "@/context/AlertContext";
 
 export default function Header() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
@@ -16,16 +17,22 @@ export default function Header() {
     null
   );
 
-  useEffect(() => {
-    async function fetchCurrentUser() {
-      try {
-        const response = await getCurrentUser();
-        setCurrentUser(response);
-      } catch (error) {
-        console.error("Failed to fetch current user:", error);
-      }
-    }
+  const { setAlert } = useAlert();
 
+  const fetchCurrentUser = async () => {
+    try {
+      const response = await getCurrentUser();
+      if (response) {
+        setCurrentUser(response);
+      } else {
+        setCurrentUser(null);
+      }
+    } catch (error) {
+      console.error("Failed to fetch current user:", error);
+    }
+  };
+
+  useEffect(() => {
     fetchCurrentUser();
   }, []);
 
@@ -33,8 +40,10 @@ export default function Header() {
     try {
       await logout();
       setCurrentUser(null);
+      setAlert("Đăng xuất thành công", "success");
     } catch (error) {
       console.error("Failed to logout:", error);
+      setAlert("Đăng xuất thất bại", "error");
     }
   };
 
@@ -87,8 +96,16 @@ export default function Header() {
           </>
         )}
 
-        <Link href="#" className="hidden md:flex">
-          <Button variant="outline" onClick={() => setIsLoginOpen(true)}>
+        <Link href={currentUser ? "/sell" : "#"} className="hidden md:flex">
+          <Button
+            variant="outline"
+            onClick={(e) => {
+              if (!currentUser) {
+                e.preventDefault();
+                setIsLoginOpen(true);
+              }
+            }}
+          >
             Đăng bán
           </Button>
         </Link>
@@ -100,6 +117,7 @@ export default function Header() {
           setIsLoginOpen(false);
           setIsRegisterOpen(true);
         }}
+        onLoginSuccess={fetchCurrentUser}
       />
       <RegisterForm
         isOpen={isRegisterOpen}
@@ -108,6 +126,7 @@ export default function Header() {
           setIsRegisterOpen(false);
           setIsLoginOpen(true);
         }}
+        onRegisterSuccess={fetchCurrentUser}
       />
     </header>
   );
