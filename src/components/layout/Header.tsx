@@ -1,7 +1,133 @@
+"use client";
+
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import LoginForm from "../ui/login-modal";
+import RegisterForm from "../ui/register-modal";
+import { useEffect, useState } from "react";
+import { getCurrentUser, logout } from "@/api/auth";
+import { useAlert } from "@/context/AlertContext";
+
 export default function Header() {
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [isRegisterOpen, setIsRegisterOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState<{ username: string } | null>(
+    null
+  );
+
+  const { setAlert } = useAlert();
+
+  const fetchCurrentUser = async () => {
+    try {
+      const response = await getCurrentUser();
+      if (response) {
+        setCurrentUser(response);
+      } else {
+        setCurrentUser(null);
+      }
+    } catch (error) {
+      console.error("Failed to fetch current user:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCurrentUser();
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      setCurrentUser(null);
+      setAlert("Đăng xuất thành công", "success");
+    } catch (error) {
+      console.error("Failed to logout:", error);
+      setAlert("Đăng xuất thất bại", "error");
+    }
+  };
+
   return (
-    <header className="w-full p-4 bg-gray-900 text-white">
-      <h1 className="text-xl font-bold">ThriftZone</h1>
+    <header className="flex justify-between items-center w-full py-4 px-6 bg-gray-900">
+      <div className="hidden md:flex text-2xl font-bold text-white">
+        ThriftZone
+      </div>
+      <div className="relative md:w-1/3 w-1/2 block">
+        <Input
+          type="text"
+          placeholder="Tìm kiếm sản phẩm..."
+          className="pl-10 pr-4 py-2 border rounded-lg w-full text-white"
+        />
+        <Search className="absolute left-3 top-2.5 h-5 w-5 text-white" />
+      </div>
+
+      <div className="items-center flex gap-4">
+        {currentUser ? (
+          <>
+            <Link href="/profile" className="hidden md:flex">
+              <Button variant="link" className="text-white">
+                {currentUser.username}
+              </Button>
+            </Link>
+            <Button
+              variant="link"
+              className="text-white"
+              onClick={handleLogout}
+            >
+              Đăng xuất
+            </Button>
+          </>
+        ) : (
+          <>
+            <Button
+              variant="link"
+              className="text-white"
+              onClick={() => setIsLoginOpen(true)}
+            >
+              Đăng nhập
+            </Button>
+            <Button
+              variant="link"
+              className="text-white hidden md:flex "
+              onClick={() => setIsRegisterOpen(true)}
+            >
+              Đăng ký
+            </Button>
+          </>
+        )}
+
+        <Link href={currentUser ? "/sell" : "#"} className="hidden md:flex">
+          <Button
+            variant="outline"
+            onClick={(e) => {
+              if (!currentUser) {
+                e.preventDefault();
+                setIsLoginOpen(true);
+              }
+            }}
+          >
+            Đăng bán
+          </Button>
+        </Link>
+      </div>
+      <LoginForm
+        isOpen={isLoginOpen}
+        setIsOpen={setIsLoginOpen}
+        switchToRegister={() => {
+          setIsLoginOpen(false);
+          setIsRegisterOpen(true);
+        }}
+        onLoginSuccess={fetchCurrentUser}
+      />
+      <RegisterForm
+        isOpen={isRegisterOpen}
+        setIsOpen={setIsRegisterOpen}
+        switchToLogin={() => {
+          setIsRegisterOpen(false);
+          setIsLoginOpen(true);
+        }}
+        onRegisterSuccess={fetchCurrentUser}
+      />
     </header>
   );
 }

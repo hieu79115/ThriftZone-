@@ -7,12 +7,6 @@ export default function Home() {
       <p className="mt-4 text-lg text-gray-600">
         Buy & sell second-hand items easily!
       </p>
-      <Button
-        className="mt-6 bg-emerald-500 hover:bg-emerald-400"
-        variant="default"
-      >
-        Start Shopping
-      </Button>
     </main>
   );
 }

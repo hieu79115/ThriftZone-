@@ -1,0 +1,185 @@
+"use client";
+
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { useAlert } from "@/context/AlertContext";
+import { register, login } from "@/api/auth";
+
+const formSchema = z
+  .object({
+    username: z.string().min(5, {
+      message: "Tài khoản phải có ít nhất 5 ký tự.",
+    }),
+    password: z
+      .string()
+      .min(8, {
+        message: "Mật khẩu phải có ít nhất 8 ký tự.",
+      })
+      .regex(/[0-9]/, { message: "Mật khẩu phải chứa ít nhất một số." }),
+    confirmpassword: z
+      .string()
+      .min(8, { message: "Xác nhận mật khẩu phải có ít nhất 8 ký tự." }),
+  })
+  .refine((data) => data.password === data.confirmpassword, {
+    message: "Mật khẩu xác nhận không khớp.",
+    path: ["confirmpassword"],
+  });
+
+export default function RegisterForm({
+  isOpen,
+  setIsOpen,
+  switchToLogin,
+  onRegisterSuccess,
+}: {
+  isOpen: boolean;
+  setIsOpen: (open: boolean) => void;
+  switchToLogin: () => void;
+  onRegisterSuccess: () => void;
+}) {
+  const [showPassword, setShowPassword] = useState(false);
+  const { setAlert } = useAlert();
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      username: "",
+      password: "",
+      confirmpassword: "",
+    },
+  });
+
+  const onSubmit = (data: any) => {
+    register(data.username, data.password)
+      .then((response) => {
+        console.log("User registered successfully:", response);
+        return login(data.username, data.password);
+      })
+      .then(() => {
+        setAlert("Đăng ký thành công!", "success");
+        setIsOpen(false);
+        onRegisterSuccess();
+      })
+      .catch((error) => {
+        setAlert("Đăng ký thất bại! Tài khoản đã tồn tại.", "error");
+      });
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogContent className="p-6 space-y-4 min-w-fit">
+        <DialogTitle className="text-xl font-semibold text-center">
+          Đăng ký
+        </DialogTitle>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="username"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Tài khoản</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="text"
+                      placeholder="Nhập tài khoản"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Mật khẩu</FormLabel>
+                  <FormControl>
+                    <Input
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Nhập mật khẩu"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="confirmpassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nhập lại mật khẩu</FormLabel>
+                  <FormControl>
+                    <Input
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Nhập lại mật khẩu"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="show"
+                onCheckedChange={() => setShowPassword(!showPassword)}
+                checked={showPassword}
+              />
+              <Label htmlFor="show" className="text-sm font-light">
+                Hiển thị mật khẩu
+              </Label>
+            </div>
+
+            <Button type="submit" className="w-full">
+              Đăng ký
+            </Button>
+
+            <p className="text-center text-sm">
+              Đã có tài khoản?{" "}
+              <span
+                className="text-blue-500 cursor-pointer"
+                onClick={() => {
+                  setShowPassword(false);
+                  switchToLogin();
+                  form.reset();
+                }}
+              >
+                Đăng nhập
+              </span>
+            </p>
+          </form>
+        </Form>
+        <DialogDescription className="sr-only">
+          Mô tả ẩn giúp cải thiện accessibility.
+        </DialogDescription>
+      </DialogContent>
+    </Dialog>
+  );
+}
