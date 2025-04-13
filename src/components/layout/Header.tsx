@@ -56,7 +56,7 @@ export default function Header() {
         <Input
           type="text"
           placeholder="Tìm kiếm sản phẩm..."
-          className="pl-10 pr-4 py-2 border rounded-lg w-full text-white"
+          className="pl-10 pr-4 py-2 border-2 rounded-lg w-full text-white focus:border-none"
         />
         <Search className="absolute left-3 top-2.5 h-5 w-5 text-white" />
       </div>
