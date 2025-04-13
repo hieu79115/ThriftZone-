@@ -78,7 +78,7 @@ function Navbar() {
 
   return (
     <nav className="bg-white shadow-md py-4 px-6 flex md:justify-center justify-between items-center">
-      <Link href="/" className="md:hidden text-xl font-bold text-gray-700">
+      <Link href="/" className="cursor-pointer md:hidden text-xl font-bold text-gray-700">
         ThriftZone
       </Link>
 
@@ -107,7 +107,7 @@ function Navbar() {
                       <Link
                         key={subIndex}
                         href={subItem.href}
-                        className="flex items-center gap-2 text-gray-700 hover:text-blue-500 text-left w-full"
+                        className="cursor-pointer flex items-center gap-2 text-gray-700 hover:text-blue-500 text-left w-full"
                         onClick={() => setIsDrawerOpen(!isDrawerOpen)}
                       >
                         {subItem.label}
@@ -119,7 +119,7 @@ function Navbar() {
                 <Link
                   key={index}
                   href={item.href}
-                  className="w-full"
+                  className="cursor-pointer w-full"
                   onClick={() => setIsDrawerOpen(!isDrawerOpen)}
                 >
                   <Button
@@ -159,7 +159,7 @@ function Navbar() {
                   >
                     <Link
                       href={subItem.href}
-                      className="flex items-center gap-2"
+                      className="cursor-pointer flex items-center gap-2"
                     >
                       <subItem.icon className="h-5 w-5" />
                       {subItem.label}
